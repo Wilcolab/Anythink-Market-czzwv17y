@@ -1,0 +1,49 @@
+/**
+ * Convert a string to snake_case.
+ *
+ * - Normalizes Unicode (removes diacritics)
+ * - Converts camelCase / PascalCase to snake_case
+ * - Replaces non-alphanumeric runs with a single underscore
+ * - Trims leading/trailing underscores and lowercases the result
+ *
+ * Examples:
+ *   toSnakeCase("HelloWorld") -> "hello_world"
+ *   toSnakeCase("  Foo Bar---baz ") -> "foo_bar_baz"
+ *   toSnakeCase("déjàVu") -> "deja_vu"
+ */
+function toSnakeCase(input) {
+    if (typeof input !== 'string') return '';
+
+    // Normalize and remove diacritics
+    const normalized = input.normalize && input.normalize('NFKD').replace(/[\u0300-\u036f]/g, '') || input;
+
+    return normalized
+        // Insert underscore between lower-to-upper transitions (fooBar -> foo_Bar)
+        .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+        // Replace any non-alphanumeric characters with underscores
+        .replace(/[^A-Za-z0-9]+/g, '_')
+        // Convert to lower case
+        .toLowerCase()
+        // Trim leading/trailing underscores
+        .replace(/^_+|_+$/g, '');
+}
+
+// Export for Node.js usage
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = toSnakeCase;
+}
+
+// Quick CLI demo when run directly: node <file>
+if (require && require.main === module) {
+    const examples = [
+        'HelloWorld',
+        '  Foo Bar---baz ',
+        'déjàVu',
+        'already_snake',
+        'mixedHTTPResponseCode',
+        '123 test'
+    ];
+    for (const e of examples) {
+        console.log(JSON.stringify(e), '=>', toSnakeCase(e));
+    }
+}
